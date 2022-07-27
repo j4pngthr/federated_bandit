@@ -1,11 +1,17 @@
 #include"global.hpp"
 #include"getRealTrace.hpp"
 
+int N = 40, T = 100000; // extern -> global.hpp
+
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout << fixed << setprecision(12);
+
+    // firstly, get N, T
+    vector<vector<pii> > contact_nodes;
+    getRealTrace(contact_nodes);
 
     vector<Agent> agt(N);
 
@@ -20,7 +26,9 @@ int main() {
         }
     }
 
-    rep(t, T) {
+    rep3(t, 1, T) {
+        if (t % 100 == 1) cerr << t << endl;
+
         rep(i, N) {
             vector<int> A;
             rep(k, M) {
@@ -57,10 +65,9 @@ int main() {
                 agt[i].X_tilde[k][t] = accumulate(all(agt[i].X[k]), 0.0) / t;
             }
         }
+
         // 時刻tに接触する2ノード
         vector<int> used(N);
-        vector<vector<pii> > contact_nodes;
-        getRealTrace(contact_nodes);
         for (pii p : contact_nodes[t]) {
             int i = p.F, j = p.S;
             used[i] = 1; used[j] = 1;
@@ -72,6 +79,15 @@ int main() {
             if (used[i]) continue;
             rep(k, M) {
                 agt[i].theta[k][t] = agt[i].theta[k][t - 1] + agt[i].X_tilde[k][t] - agt[i].X_tilde[k][t - 1];
+            }
+        }
+
+        // 報酬を出力
+        rep(i, N) {
+            rep(k, M) {
+                double r = agt[i].X[k][t];
+                if (r < eps) continue;
+                cerr << "i t r " << i << " " << t << " " << r << endl;
             }
         }
     }

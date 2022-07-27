@@ -44,9 +44,8 @@ using pip = pair<int, pii>;
 const int inf = numeric_limits<int>::max();
 const double dinf = numeric_limits<double>::infinity();
 
-const int N = 40;
+extern int N, T;
 const int M = 10;
-const int T = 100000;
 
 class Lever {
     double mu, sig = 1;
@@ -85,25 +84,25 @@ public:
         a = vector<int>(T);
     }
 
-    // void calc_C(vector<Lever> lv, int t) {
-    //     double max_val = 0;
-    //     int arm_id = -1;
-    //     double c = 1.0;
-    //     rep(k, M) {
-    //         if (chmax(max_val, C[k][t] + c * sqrt(log(t) / n[k][t]))) {
-    //             arm_id = k;
-    //         }
-    //     }
-    //
-    //     double r = lv[arm_id].play();
-    //     n[arm_id][t] += 1;
-    //
-    //     if (n[arm_id][t] == 1) {
-    //         C[arm_id][t] = r;
-    //     } else {
-    //         C[arm_id][t] = C[arm_id][t] + (r - C[arm_id][t]) / n[arm_id][t];
-    //     }
-    // }
+    void calc_C(vector<Lever> lv, int t) {
+        double max_val = 0;
+        int arm_id = -1;
+        double c = 1.0;
+        rep(k, M) {
+            if (chmax(max_val, C[k][t] + c * sqrt(log(t) / n[k][t]))) {
+                arm_id = k;
+            }
+        }
+
+        double r = lv[arm_id].play();
+        n[arm_id][t] += 1;
+
+        if (n[arm_id][t] == 1) {
+            C[arm_id][t] = r;
+        } else {
+            C[arm_id][t] = C[arm_id][t] + (r - C[arm_id][t]) / n[arm_id][t];
+        }
+    }
 };
 
 #endif
