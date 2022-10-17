@@ -9,8 +9,8 @@ bool isVldId(int node) {
 }
 
 // get N, T
-void getRealTrace(vector<vector<pii> >& contact_nodes) {
-    N = end_vld_id - start_vld_id + 1;
+void getRealTrace(vector<vector<pii> >& contact_nodes, vector<Agent>& agt) {
+    // N = end_vld_id - start_vld_id + 1;
 
     // 入力ファイル
     string str = "contacts.Exp";
@@ -40,14 +40,17 @@ void getRealTrace(vector<vector<pii> >& contact_nodes) {
         chmin(first_contact_ut, contact_ut);
 
         v2[0] -= start_vld_id; v2[1] -= start_vld_id;
+        agt[v2[0]].e.insert(v2[1]); agt[v2[1]].e.insert(v2[0]);
         v.eb(v2);
     }
     cerr << "fi_co_ut la_co_ut " << first_contact_ut << " " << last_contact_ut << endl;
-    T = last_contact_ut;
+    T = last_contact_ut - first_contact_ut + 2;
 
     contact_nodes.resize(T);
     rep(i, sz(v)) {
         int node1 = v[i][0], node2 = v[i][1], contact_ut = v[i][2];
+        contact_ut -= first_contact_ut;
+        contact_ut += 2; // 時刻0にコンタクトが起きてほしくない グラフ的に
         contact_nodes[contact_ut].eb(node1, node2);
     }
     cerr << "N T " << N << " " << T << endl;

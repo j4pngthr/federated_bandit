@@ -48,18 +48,22 @@ extern int N, T;
 const int M = 10;
 
 class Lever {
-    double mu, sig = 1;
+    double mu;
+    const double sig = 1;
+    random_device seed_gen;
 public:
+    double getMu() {
+        return mu;
+    }
+
     Lever() {
-        random_device seed_gen;
         default_random_engine engine(seed_gen());
         normal_distribution<> dist(0, 1);
         mu = dist(engine);
     }
     double play() {
-        random_device seed_gen;
         default_random_engine engine(seed_gen());
-        normal_distribution<> dist(0, 1);
+        normal_distribution<> dist(mu, sig);
         double r = dist(engine);
         return r;
     }
@@ -68,41 +72,51 @@ public:
 class Agent {
 public:
     vector<vector<double> > X, X_tilde, n, n_tilde, theta, Q, C;
-
-    vector<pid> e;
     vector<int> a;
 
+    // vector<pid> e;
+    set<int> e; // 隣接ノードの集合
+
     Agent() {
-        X = vector<vector<double> >(M, vector<double>(T));
-        X_tilde = vector<vector<double> >(M, vector<double>(T));
-        n = vector<vector<double> >(M, vector<double>(T));
-        n_tilde = vector<vector<double> >(M, vector<double>(T));
-        theta = vector<vector<double> >(M, vector<double>(T));
-        Q = vector<vector<double> >(M, vector<double>(T));
-        // C = vector<vector<double> >(M, vector<double>(T));
-
-        a = vector<int>(T);
+        assert(T > 0);
+        X = vector<vector<double> >(M, vector<double>(T + 5));
+        X_tilde = vector<vector<double> >(M, vector<double>(T + 5));
+        C = vector<vector<double> >(M, vector<double>(T + 5));
+        n = vector<vector<double> >(M, vector<double>(T + 5));
+        n_tilde = vector<vector<double> >(M, vector<double>(T + 5));
+        theta = vector<vector<double> >(M, vector<double>(T + 5));
+        Q = vector<vector<double> >(M, vector<double>(T + 5));
+        a = vector<int>(T + 5);
     }
 
-    void calc_C(vector<Lever> lv, int t) {
-        double max_val = 0;
-        int arm_id = -1;
-        double c = 1.0;
-        rep(k, M) {
-            if (chmax(max_val, C[k][t] + c * sqrt(log(t) / n[k][t]))) {
-                arm_id = k;
-            }
-        }
+    // Agent() {
+    //     X = vector<vector<double> >(M, vector<double>(3));
+    //     X_tilde = vector<vector<double> >(M, vector<double>(3));
+    //     n = vector<vector<double> >(M, vector<double>(3));
+    //     n_tilde = vector<vector<double> >(M, vector<double>(3));
+    //     theta = vector<vector<double> >(M, vector<double>(3));
+    //     Q = vector<vector<double> >(M, vector<double>(3));
+    // }
 
-        double r = lv[arm_id].play();
-        n[arm_id][t] += 1;
-
-        if (n[arm_id][t] == 1) {
-            C[arm_id][t] = r;
-        } else {
-            C[arm_id][t] = C[arm_id][t] + (r - C[arm_id][t]) / n[arm_id][t];
-        }
-    }
+    // void calc_C(vector<Lever> lv, int t) {
+    //     double max_val = 0;
+    //     int arm_id = -1;
+    //     double c = 1.0;
+    //     rep(k, M) {
+    //         if (chmax(max_val, C[k][t] + c * sqrt(log(t) / n[k][t]))) {
+    //             arm_id = k;
+    //         }
+    //     }
+    //
+    //     double r = lv[arm_id].play();
+    //     n[arm_id][t] += 1;
+    //
+    //     if (n[arm_id][t] == 1) {
+    //         C[arm_id][t] = r;
+    //     } else {
+    //         C[arm_id][t] = C[arm_id][t] + (r - C[arm_id][t]) / n[arm_id][t];
+    //     }
+    // }
 };
 
 #endif
